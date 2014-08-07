@@ -9,22 +9,24 @@ angular.module('ngSqlite', ['config'])
     } else if (window.openDatabase) {
       self.db = window.openDatabase(DB_CONFIG.name, '1.0', 'database', -1);
     }
-
-    angular.forEach(DB_CONFIG.tables, function(table) {
-      var columns = [];
-
-      angular.forEach(table.columns, function(column) {
-        columns.push(column.name + ' ' + column.type);
-      });
-      var query = 'CREATE TABLE IF NOT EXISTS ' + table.name + ' (' + columns.join(',') + ')';
-      self.query(query)
-      .then(function(result) {
-        console.log('Table "' + table.name + '" initialized.');
-      }, function(error) {
-        console.log(error);
-      });
-    });
   };
+
+  /*Transformar em funcao que cria tabela recebendo um json
+  angular.forEach(DB_CONFIG.tables, function(table) {
+    var columns = [];
+
+    angular.forEach(table.columns, function(column) {
+      columns.push(column.name + ' ' + column.type);
+    });
+    var query = 'CREATE TABLE IF NOT EXISTS ' + table.name + ' (' + columns.join(',') + ')';
+    self.query(query)
+    .then(function(result) {
+      console.log('Table "' + table.name + '" initialized.');
+    }, function(error) {
+      console.log(error);
+    });
+  });
+  */
 
   self.query = function(query, bindings) {
     bindings = typeof bindings !== 'undefined' ? bindings : [];
@@ -40,7 +42,7 @@ angular.module('ngSqlite', ['config'])
     return deferred.promise;
   };
 
-  self.fetchAll = function(result) {
+  self.fetchResult = function(result) {
     var output = [];
 
     for (var i = 0; i < result.rows.length; i++) {
@@ -53,15 +55,16 @@ angular.module('ngSqlite', ['config'])
   return self;
 })
 
-.factory('Document', function(DB, DB_CONFIG) {
+.factory('Document', function(DB) {
   var self = this;
 
-  self.all = function() {
-    return DB.query('SELECT * FROM places')
+  //escrever funcao find. se receber vazio ou objeto vazio retorna todos
+  self.all = function(table) {
+    return DB.query('SELECT * FROM ' + table)
     .then(function(result) {
-      return DB.fetchAll(result);
+      return DB.fetchResult(result);
     }, function(error) {
-      console.log(error);
+      return error;
     });
   };
 
