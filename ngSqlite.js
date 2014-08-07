@@ -11,7 +11,7 @@ angular.module('ngSqlite', ['config'])
     }
   };
 
-  /*Transformar em funcao que cria tabela recebendo um json
+  /*Transformar em funcao que cria tabela recebendo um JSON 
   angular.forEach(DB_CONFIG.tables, function(table) {
     var columns = [];
 
